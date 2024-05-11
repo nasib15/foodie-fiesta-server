@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -37,8 +37,16 @@ async function run() {
     // Routes
     // Getting all datas from the database
     app.get("/foods", async (req, res) => {
-      const foods = await foodsCollection.find().toArray();
-      res.send(foods);
+      const result = await foodsCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Getting a single data from the database
+    app.get("/food/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodsCollection.findOne(query);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
