@@ -32,8 +32,15 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    const foodsCollection = client.db("foodsDB").collection("foodsCollection");
+
+    // Routes
+    // Getting all datas from the database
+    app.get("/foods", async (req, res) => {
+      const foods = await foodsCollection.find().toArray();
+      res.send(foods);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
