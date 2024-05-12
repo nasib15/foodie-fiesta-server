@@ -35,17 +35,26 @@ async function run() {
     const foodsCollection = client.db("foodsDB").collection("foodsCollection");
 
     // Routes
+
     // Getting all datas from the database
     app.get("/foods", async (req, res) => {
       const result = await foodsCollection.find().toArray();
       res.send(result);
     });
 
-    // Getting a single data from the database
+    // Getting a single data by ID from the database
     app.get("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Getting a single data for a specific user from the database
+    app.get("/foods/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { donor_email: email };
+      const result = await foodsCollection.find(query).toArray();
       res.send(result);
     });
 
