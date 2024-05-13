@@ -17,6 +17,12 @@ const corsOptions = {
   optionSuccessStatus: 200,
 };
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+};
+
 // Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -37,6 +43,15 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const foodsCollection = client.db("foodsDB").collection("foodsCollection");
+
+    // Generate a JWT token
+    app.post("/jwt", (req, res) => {
+      const email = req.body;
+      const token = jwt.sign(email, process.env.SECRET_KEY, {
+        expiresIn: "1h",
+      });
+      res.cookie("token", token, cookieOptions).send({ success: true });
+    });
 
     // Routes
 
