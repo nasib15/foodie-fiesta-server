@@ -39,9 +39,13 @@ async function run() {
     // Getting all datas from the database
     app.get("/foods", async (req, res) => {
       const sort = req.query.sort;
+      const search = req.query.search;
       const status = req.query.status;
       const option = { sort: { expired_date: sort === "asc" ? 1 : -1 } };
       const query = { status: status };
+      if (search) {
+        query.food_name = { $regex: search, $options: "i" };
+      }
       const result = await foodsCollection.find(query, option).toArray();
       res.send(result);
     });
