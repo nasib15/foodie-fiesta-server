@@ -8,7 +8,11 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://foodie-fiesta-knh-nehal.vercel.app",
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };
