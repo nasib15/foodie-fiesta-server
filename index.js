@@ -41,8 +41,14 @@ async function run() {
       const sort = req.query.sort;
       const search = req.query.search;
       const status = req.query.status;
-      const option = { sort: { expired_date: sort === "asc" ? 1 : -1 } };
-      const query = { status: status };
+      let option = {};
+      let query = {};
+      if (sort) {
+        option = { sort: { expired_date: sort === "asc" ? 1 : -1 } };
+      }
+      if (status) {
+        query = { status: status };
+      }
       if (search) {
         query.food_name = { $regex: search, $options: "i" };
       }
