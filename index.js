@@ -38,8 +38,11 @@ async function run() {
 
     // Getting all datas from the database
     app.get("/foods", async (req, res) => {
-      const query = { status: "Available" };
-      const result = await foodsCollection.find(query).toArray();
+      const sort = req.query.sort;
+      const status = req.query.status;
+      const option = { sort: { expired_date: sort === "asc" ? 1 : -1 } };
+      const query = { status: status };
+      const result = await foodsCollection.find(query, option).toArray();
       res.send(result);
     });
 
@@ -80,7 +83,6 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.deleteOne(query);
-      console.log(result);
       res.send(result);
     });
 
