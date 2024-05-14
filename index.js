@@ -11,7 +11,6 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://localhost:5174",
-    "https://foodie-fiesta-knh-nehal.vercel.app",
     "https://foodiefiesta-b4714.web.app",
     "https://foodiefiesta-b4714.firebaseapp.com",
   ],
@@ -32,14 +31,14 @@ app.use(cookieParser());
 
 // Verify a JWT middleware
 const verifyToken = (req, res, next) => {
-  const token = req?.cookies?.token;
+  const token = req.cookies?.token;
   if (!token) {
     return res.status(401).send({ error: "Unauthorized Access" });
   }
   if (token) {
     jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) {
-        return res.status(403).send({ error: "Forbidden Access" });
+        return res.status(401).send({ error: "Unauthorized Access" });
       }
       console.log(decoded);
       req.user = decoded;
@@ -115,6 +114,8 @@ async function run() {
     // Getting a single data for a specific user from the database
     app.get("/foods/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
+      if (email !== req.user?.email)
+        return res.status(403).send({ error: "Forbidden Access" });
       const query = { donor_email: email };
       const result = await foodsCollection.find(query).toArray();
       res.send(result);
