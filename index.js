@@ -30,6 +30,24 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
+// Verify a JWT middleware
+const verifyToken = (req, res, next) => {
+  const token = req?.cookies?.token;
+  if (!token) {
+    return res.status(401).send({ error: "Unauthorized Access" });
+  }
+  if (token) {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+      if (err) {
+        return res.status(403).send({ error: "Forbidden Access" });
+      }
+      console.log(decoded);
+      req.user = decoded;
+      next();
+    });
+  }
+};
+
 // Connection URI
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.talr0yk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -87,7 +105,7 @@ async function run() {
     });
 
     // Getting a single data by ID from the database
-    app.get("/food/:id", async (req, res) => {
+    app.get("/food/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.findOne(query);
@@ -95,7 +113,7 @@ async function run() {
     });
 
     // Getting a single data for a specific user from the database
-    app.get("/foods/:email", async (req, res) => {
+    app.get("/foods/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { donor_email: email };
       const result = await foodsCollection.find(query).toArray();
@@ -103,14 +121,14 @@ async function run() {
     });
 
     // Posting a data to the database
-    app.post("/foods", async (req, res) => {
+    app.post("/foods", verifyToken, async (req, res) => {
       const data = req.body;
       const result = await foodsCollection.insertOne(data);
       res.send(result);
     });
 
     // Updating a data in the database
-    app.patch("/food/:id", async (req, res) => {
+    app.patch("/food/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const update = { $set: req.body };
@@ -119,7 +137,7 @@ async function run() {
     });
 
     // Deleting a data from the database
-    app.delete("/food/:id", async (req, res) => {
+    app.delete("/food/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.deleteOne(query);
