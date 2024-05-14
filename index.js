@@ -12,6 +12,8 @@ const corsOptions = {
     "http://localhost:5173",
     "http://localhost:5174",
     "https://foodie-fiesta-knh-nehal.vercel.app",
+    "https://foodiefiesta-b4714.web.app",
+    "https://foodiefiesta-b4714.firebaseapp.com",
   ],
   credentials: true,
   optionSuccessStatus: 200,
@@ -48,10 +50,19 @@ async function run() {
     app.post("/jwt", (req, res) => {
       const email = req.body;
       const token = jwt.sign(email, process.env.SECRET_KEY, {
-        expiresIn: "1h",
+        expiresIn: "365d",
       });
       res.cookie("token", token, cookieOptions).send({ success: true });
     });
+
+    // Clear the token on logout
+    app.get("/logout", (req, res) => {
+      res
+        .clearCookie("token", { ...cookieOptions, maxAge: 0 })
+        .send({ success: true });
+    });
+
+    // Verify a JWT token
 
     // Routes
 
