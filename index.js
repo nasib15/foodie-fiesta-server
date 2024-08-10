@@ -106,7 +106,7 @@ async function run() {
     });
 
     // Getting a single data by ID from the database
-    app.get("/food/:id", verifyToken, async (req, res) => {
+    app.get("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.findOne(query);
@@ -114,7 +114,7 @@ async function run() {
     });
 
     // Getting a single data for a specific user from the database
-    app.get("/foods/:email", verifyToken, async (req, res) => {
+    app.get("/foods/:email", async (req, res) => {
       const email = req.params.email;
       if (email !== req.user?.email)
         return res.status(403).send({ error: "Forbidden Access" });
@@ -124,14 +124,14 @@ async function run() {
     });
 
     // Posting a data to the database
-    app.post("/foods", verifyToken, async (req, res) => {
+    app.post("/foods", async (req, res) => {
       const data = req.body;
       const result = await foodsCollection.insertOne(data);
       res.send(result);
     });
 
     // Updating a data in the database
-    app.patch("/food/:id", verifyToken, async (req, res) => {
+    app.patch("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const update = { $set: req.body };
@@ -140,7 +140,7 @@ async function run() {
     });
 
     // Deleting a data from the database
-    app.delete("/food/:id", verifyToken, async (req, res) => {
+    app.delete("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodsCollection.deleteOne(query);
